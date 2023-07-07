@@ -1,12 +1,18 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import {
-  Link,
+  Link, useLocation,
 } from "react-router-dom";
 
 const Navbar = () => {
     // require('react-dom');
     // window.React2 = require('react');
     // console.log(window.React1 === window.React2);
+    const location = useLocation();
+
+    useEffect(()=>{
+        // console.log(location.pathname);
+    },[location]);
+
     return (
       <div>
         <nav className="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
@@ -17,8 +23,8 @@ const Navbar = () => {
                 </button>
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li className="nav-item"><Link className="nav-link active" aria-current="page" to="/">Home</Link></li>
-                    <li className="nav-item"><Link className="nav-link active" aria-current="page" to="/about">About</Link></li>
+                    <li className="nav-item"><Link className={`nav-link ${location.pathname==="/"?"active":""}`} aria-current="page" to="/">Home</Link></li>
+                    <li className="nav-item"><Link className={`nav-link ${location.pathname==="/about"?"active":""}`} aria-current="page" to="/about">About</Link></li>
                 </ul>
                
                 </div>
