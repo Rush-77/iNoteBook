@@ -2,87 +2,103 @@ import { useState } from 'react'
 import NoteContext from './noteContext'
 
 const NoteState = (props) => {
+    const host = "http://localhost:5000";
+    const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjRhMmEwZjdlZDQzYTk2NzI0NDJkZTU2In0sImlhdCI6MTY4ODM3OTYzOX0.dmDpo6UE_D-Ms-J9J_vaF67N0rhq8psrcq0hWOaMxf0";
+    const initnotes= []
 
-    const initnotes= [
-        {
-          "_id": "64a3e3118982a199cd89ebef",
-          "userid": "64a2a0f7ed43a9672442de56",
-          "title": "C-DAC",
-          "description": "The Centre for Development of Advanced Computing is an Indian autonomous scientific society, operating under the Ministry of Electronics and Information Technology.",
-          "tag": "Info",
-          "date": "2023-07-04T09:14:57.580Z",
-          "__v": 0
-        },
-        {
-          "_id": "64a3f7cd6233bd15394f6adf",
-          "userid": "64a2a0f7ed43a9672442de56",
-          "title": "Thunder client",
-          "description": "Thunder Client is a lightweight Rest API Client Extension for Visual Studio Code for Testing APIs.",
-          "tag": "Info",
-          "date": "2023-07-04T10:43:25.532Z",
-          "__v": 0
-        },
-        {
-          "_id": "64a7adc3d67d4a7b49abb6a9",
-          "userid": "64a2a0f7ed43a9672442de56",
-          "title": "EPFO",
-          "description": "The Employees' Provident Fund Organisation is one of the two main social security organization under the Government of India's Ministry of Labour and Employment and is responsible for regulation and management of provident funds in India, the other being Employees' State Insurance.",
-          "tag": "Finance",
-          "date": "2023-07-07T06:16:35.524Z",
-          "__v": 0
-        },
-        {
-          "_id": "64a7adedd67d4a7b49abb6ab",
-          "userid": "64a2a0f7ed43a9672442de56",
-          "title": "M.S.DHONI",
-          "description": "Mahendra Singh Dhoni is an Indian professional cricketer. He was captain of the Indian national team in limited-overs formats from 2007 to 2017 and in Test cricket from 2008 to 2014. He plays as a right-handed wicket-keeper-batsman and is also the current captain of Chennai Super Kings in the Indian Premier League.",
-          "tag": "Sport",
-          "date": "2023-07-07T06:17:17.633Z",
-          "__v": 0
-        },
-        {
-          "_id": "64a7ae1fd67d4a7b49abb6ad",
-          "userid": "64a2a0f7ed43a9672442de56",
-          "title": "NIFTY 50",
-          "description": "The NIFTY 50 is a benchmark Indian stock market index that represents the weighted average of 50 of the largest Indian companies listed on the National Stock Exchange. Nifty 50 is owned and managed by NSE Indices, which is a wholly owned subsidiary of the NSE Strategic Investment Corporation Limited.",
-          "tag": "Business",
-          "date": "2023-07-07T06:18:07.934Z",
-          "__v": 0
-        }
-      ]
+      const [notes,setNotes] = useState(initnotes);      
 
-        const [notes,setNotes] = useState(initnotes);      
+      // Get All notes of logged in users
+      const getAllNotes = async() =>{
+        props.setProgress(20);
+        const response = await fetch(`${host}/api/note/getnotes`, {
+          method: "GET", 
+          headers: {
+            "auth-token": authToken
+          }
+        });
+        props.setProgress(70);
+        const json = await response.json();
+        setNotes(json)
+        props.setProgress(100);
+      }
 
       // Add new note
-      const addNote = (uNote) =>{
+      const addNote = async(uNote) =>{
+        props.setProgress(20);
         console.log(uNote);
-        const note = {
-            "_id": "64a7ae1fd67d4a7b49abb6ad1",
-            "userid": "64a2a0f7ed43a9672442de56",
-            "title": uNote.title,
-            "description": uNote.description,
-            "tag": uNote.tag,
-            "date": "2023-07-07T06:18:07.934Z",
-            "__v": 0
-        }
-        setNotes(notes.concat(note));
+        const title = uNote.title;
+        const description =uNote.description;
+        const tag = uNote.tag;
+        const response = await fetch(`${host}/api/note/addnote`, {
+          method: "POST", 
+          headers: {
+            "Content-Type": "application/json",
+            "auth-token": authToken
+          },
+          body: JSON.stringify({title,description,tag}),
+        });
+        props.setProgress(70);
+        const json = await response.json();
+        console.log(json);
+        setNotes(notes.concat(json));
+        props.setProgress(100);
       }
 
       // Delete a note
-      const deleteNote = (id)=>{
+      const deleteNote = async(id)=>{
+        props.setProgress(20);
+        const response = await fetch(`${host}/api/note/deletenote/${id}`, {
+          method: "DELETE", 
+          headers: {
+            "Content-Type": "application/json",
+            "auth-token": authToken
+          }
+        });
+        // const json = await response.json();
+        props.setProgress(70);
+        console.log(response);
         const newNote = notes.filter((note)=>{return note._id !== id});
         setNotes(newNote);
+        props.setProgress(100);
       }
 
       // Edit a note
-    //   const editNote = (uNote)=>{
-    //     const newNote = notes.filter((note)=>{return note._id = id});
-    //     setNotes(newNote);
-    //   }
+      const editNote = async(uNote)=>{
+        props.setProgress(20);
+        const id = uNote._id;
+        const title = uNote.title;
+        const description =uNote.description;
+        const tag = uNote.tag;
+        const response = await fetch(`${host}/api/note/updatenote/${id}`, {
+          method: "PUT", 
+          headers: {
+            "Content-Type": "application/json",
+            "auth-token": authToken
+          },
+          body: JSON.stringify({title,description,tag}),
+        });
+        props.setProgress(50);
+        const json = await response.json();
+        console.log(json);
+        props.setProgress(70);
+        const newNote = notes.filter((note)=>{
+          if(note._id === json._id){
+            note.title = json.title;
+            note.description = json.description;
+            note.tag = json.tag;
+            console.log('copied json' + json._id);
+            console.log('note : ' + note.description);
+          }
+          return note;
+        });
+        setNotes(newNote);
+        props.setProgress(100);
+      }
    
    
     return (
-        <NoteContext.Provider value={{notes,addNote,deleteNote}}>
+        <NoteContext.Provider value={{notes,getAllNotes,addNote,deleteNote,editNote}}>
             {props.children}
         </NoteContext.Provider>
     )
