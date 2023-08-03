@@ -5,7 +5,7 @@ const Noteitem = (props) => {
     let myStyle = {
         fontSize:'20px'
     }
-    const {note} = props;
+    const {note,openNote} = props;
 
     const context = useContext(NoteContext);
     const {deleteNote} = context;
@@ -24,11 +24,9 @@ const Noteitem = (props) => {
                 </div>
                 <p className="card-text text-muted my-2">{note.description}</p>
                 <i className="bi bi-trash mx-2" style={myStyle} onClick={deleteClick}></i>
-                <i className="bi bi-pencil-square" style={myStyle}></i>
+                <i className="bi bi-pencil-square" style={myStyle} onClick={()=>{openNote(note)}}></i>
             </div>
         </div>
-        
-        
     </div>
   )
 }
