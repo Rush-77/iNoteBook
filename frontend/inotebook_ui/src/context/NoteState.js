@@ -2,21 +2,103 @@ import { useState } from 'react'
 import NoteContext from './noteContext'
 
 const NoteState = (props) => {
+    const host = "http://localhost:5000";
+    const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjRhMmEwZjdlZDQzYTk2NzI0NDJkZTU2In0sImlhdCI6MTY4ODM3OTYzOX0.dmDpo6UE_D-Ms-J9J_vaF67N0rhq8psrcq0hWOaMxf0";
+    const initnotes= []
 
-    const n1= {
-        "title":"my title"
-    }
+      const [notes,setNotes] = useState(initnotes);      
 
-    const [note,setNote] = useState(n1);
-    
-    const updateNote = () =>{
-        setTimeout(() => {
-            setNote({"title":"second title"})
-        }, 2000);
-    }
+      // Get All notes of logged in users
+      const getAllNotes = async() =>{
+        props.setProgress(20);
+        const response = await fetch(`${host}/api/note/getnotes`, {
+          method: "GET", 
+          headers: {
+            "auth-token": authToken
+          }
+        });
+        props.setProgress(70);
+        const json = await response.json();
+        setNotes(json)
+        props.setProgress(100);
+      }
 
+      // Add new note
+      const addNote = async(uNote) =>{
+        props.setProgress(20);
+        console.log(uNote);
+        const title = uNote.title;
+        const description =uNote.description;
+        const tag = uNote.tag;
+        const response = await fetch(`${host}/api/note/addnote`, {
+          method: "POST", 
+          headers: {
+            "Content-Type": "application/json",
+            "auth-token": authToken
+          },
+          body: JSON.stringify({title,description,tag}),
+        });
+        props.setProgress(70);
+        const json = await response.json();
+        console.log(json);
+        setNotes(notes.concat(json));
+        props.setProgress(100);
+      }
+
+      // Delete a note
+      const deleteNote = async(id)=>{
+        props.setProgress(20);
+        const response = await fetch(`${host}/api/note/deletenote/${id}`, {
+          method: "DELETE", 
+          headers: {
+            "Content-Type": "application/json",
+            "auth-token": authToken
+          }
+        });
+        // const json = await response.json();
+        props.setProgress(70);
+        console.log(response);
+        const newNote = notes.filter((note)=>{return note._id !== id});
+        setNotes(newNote);
+        props.setProgress(100);
+      }
+
+      // Edit a note
+      const editNote = async(uNote)=>{
+        props.setProgress(20);
+        const id = uNote._id;
+        const title = uNote.title;
+        const description =uNote.description;
+        const tag = uNote.tag;
+        const response = await fetch(`${host}/api/note/updatenote/${id}`, {
+          method: "PUT", 
+          headers: {
+            "Content-Type": "application/json",
+            "auth-token": authToken
+          },
+          body: JSON.stringify({title,description,tag}),
+        });
+        props.setProgress(50);
+        const json = await response.json();
+        console.log(json);
+        props.setProgress(70);
+        const newNote = notes.filter((note)=>{
+          if(note._id === json._id){
+            note.title = json.title;
+            note.description = json.description;
+            note.tag = json.tag;
+            console.log('copied json' + json._id);
+            console.log('note : ' + note.description);
+          }
+          return note;
+        });
+        setNotes(newNote);
+        props.setProgress(100);
+      }
+   
+   
     return (
-        <NoteContext.Provider value={{note,updateNote}}>
+        <NoteContext.Provider value={{notes,getAllNotes,addNote,deleteNote,editNote}}>
             {props.children}
         </NoteContext.Provider>
     )
