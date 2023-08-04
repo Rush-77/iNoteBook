@@ -27,13 +27,13 @@ function Addnote(props) {
         <form>
             <div className="mb-3">
                 <label htmlFor="title" className="form-label">Title</label>
-                <input type="text" className="form-control" id="title" name="title" onChange={getNewValue}/>
+                <input type="text" className="form-control" id="title" name="title" onChange={getNewValue} minLength={3} required />
             </div>
             <div className="mb-3">
                 <label htmlFor="description" className="form-label">Description</label>
-                <input type="text" className="form-control" id="description" name="description" onChange={getNewValue}/>
+                <input type="text" className="form-control" id="description" name="description" onChange={getNewValue} minLength={5} required/>
             </div>
-            <div className="btn-group" >
+            <div className="btn-group" required>
                 <button className="btn btn-sm rounded-pill btn-outline-primary" name="General" onClick={setTag}>General</button>  &nbsp;&nbsp;
                 <button className="btn btn-sm rounded-pill btn-outline-secondary" name="Business" onClick={setTag}>Business</button> &nbsp;&nbsp;
                 <button className="btn btn-sm rounded-pill btn-outline-success" name="Entertainment" onClick={setTag}>Entertainment</button>  &nbsp;&nbsp;
@@ -44,7 +44,7 @@ function Addnote(props) {
             </div>
             <br></br>
             <br></br>
-            <button type="submit" className="btn btn-primary" onClick={addNewNote}>Submit</button>
+            <button disabled={note.title.length<3 || note.description.length<5 || note.tag.length===0} type="submit" className="btn btn-primary" onClick={addNewNote}>Submit</button>
             
             
         </form>
