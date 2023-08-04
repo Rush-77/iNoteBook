@@ -21,6 +21,7 @@ const NoteState = (props) => {
         const json = await response.json();
         setNotes(json)
         props.setProgress(100);
+        props.showAlert('Notes Found.','info');
       }
 
       // Add new note
@@ -43,6 +44,7 @@ const NoteState = (props) => {
         console.log(json);
         setNotes(notes.concat(json));
         props.setProgress(100);
+        props.showAlert('Note Added Successfully.','success');
       }
 
       // Delete a note
@@ -61,6 +63,7 @@ const NoteState = (props) => {
         const newNote = notes.filter((note)=>{return note._id !== id});
         setNotes(newNote);
         props.setProgress(100);
+        props.showAlert('Note Deleted Successfully.','success');
       }
 
       // Edit a note
@@ -94,6 +97,7 @@ const NoteState = (props) => {
         });
         setNotes(newNote);
         props.setProgress(100);
+        props.showAlert('Note Updated Successfully.','success');
       }
    
    

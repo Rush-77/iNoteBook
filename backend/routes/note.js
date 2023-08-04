@@ -14,11 +14,11 @@ router.post(
         body('description','Description should be more than 5 character').isLength({min:3}) 
     ],
     async(req,res) =>{
-
+        let success = false;
         try{
             const errors = validationResult(req); //check for input parameter validation/sanitization
             if(!errors.isEmpty()){
-                return res.status(400).json({error: errors.array()});
+                return res.status(400).json({error: errors.array(),success});
             }
 
             const {title,description,tag} = req.body;
@@ -27,11 +27,11 @@ router.post(
                 title,description,tag,userid:req.user.id
             })
             const savenote = await note.save();
-
-            res.json(note)
+            success = true;
+            res.json({success,note})
         }catch(error){
             console.error(error);
-            res.status(500).json({error: 'Something went wrong!.'});
+            res.status(500).json({success,error: 'Something went wrong!.'});
         }
     }
 );
@@ -44,6 +44,7 @@ router.get(
     async(req,res)=>{
         try{
             const notes = await Note.find({userid : req.user.id});
+            success = true;
             res.json(notes);
         }catch(error){
             console.error(error);
@@ -86,7 +87,7 @@ router.put(
 
         }catch(error){
             console.error(error);
-            res.status(500).json({error: 'Something went wrong!.'});
+            res.status(500).json({success,error: 'Something went wrong!.'});
         }
     }
 );
