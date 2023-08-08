@@ -9,7 +9,7 @@ const About = () => {
     return (
       <div className='container' style={{'marginTop':'70px'}}>
         <h2>About Us</h2>
-        <p className='blockquote-footer'>Click on the button to to know about us.</p>
+        <p className='blockquote-footer'>Click on the below button to to know about us.</p>
         <span type="button" className="btn btn-danger my-3" data-toggle="collapse" data-target="#demo1" style={myStyle}>Purpose</span>
         <div id="demo1" className="collapse m-3" >
             As world’s technology is rapidly growing we has fast connection and network to instantly connect to other person. Day to day use in mobile, tablets and laptop is increasing,
