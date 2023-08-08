@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import {
-  Link, useLocation,
+  Link, useLocation, useNavigate,
 } from "react-router-dom";
 
 const Navbar = () => {
@@ -8,10 +8,16 @@ const Navbar = () => {
     // window.React2 = require('react');
     // console.log(window.React1 === window.React2);
     const location = useLocation();
+    const navigate = useNavigate();
 
     useEffect(()=>{
         // console.log(location.pathname);
     },[location]);
+
+    const handleLogout = ()=>{
+        localStorage.removeItem('token');
+        navigate('/login');
+    }
 
     return (
       <div>
@@ -26,11 +32,15 @@ const Navbar = () => {
                     <li className="nav-item"><Link className={`nav-link ${location.pathname==="/"?"active":""}`} aria-current="page" to="/">Home</Link></li>
                     <li className="nav-item"><Link className={`nav-link ${location.pathname==="/about"?"active":""}`} aria-current="page" to="/about">About</Link></li>
                 </ul>
-               
-                <ul className="navbar-nav ml-auto mb-2 my-lg-0">
-                    <li className="nav-item"><Link className={`nav-link ${location.pathname==="/login"?"active":""}`} aria-current="page" to="/login">Login</Link></li>
-                    <li className="nav-item"><Link className={`nav-link ${location.pathname==="/register"?"active":""}`} aria-current="page" to="/register">Register</Link></li>
-                </ul>
+                {!localStorage.getItem('token')?
+                    <ul className="navbar-nav ml-auto mb-2 my-lg-0">
+                        <li className="nav-item"><Link className={`nav-link ${location.pathname==="/login"?"active":""}`} aria-current="page" to="/login">Login</Link></li>
+                        <li className="nav-item"><Link className={`nav-link ${location.pathname==="/register"?"active":""}`} aria-current="page" to="/register">Register</Link></li>
+                    </ul>:
+                    <ul className="navbar-nav ml-auto mb-2 my-lg-0">
+                        <li className="nav-item"><button className='btn btn-sm btn-light' aria-current="page" onClick={handleLogout}>Logout</button></li>
+                    </ul>
+                }
                 </div>
             </div>
             </nav>

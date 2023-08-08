@@ -16,6 +16,7 @@ router.post('/createUser',
         body('password','Password should be more than 5 character').isLength({min:3})   //apply condition to validate data
     ]
     ,async (req,res)=>{
+        let success = false;
         const errors = validationResult(req); //check for input parameter validation/sanitization
         if(!errors.isEmpty()){
             return res.status(400).json({error: errors.array()});
@@ -25,19 +26,17 @@ router.post('/createUser',
             //Check user with given email exist or not
             let user = await User.findOne({email: req.body.email});
             if(user){
-                return res.status(400).json({error: 'User is already exist in system.'});
+                return res.status(400).json({success,error: 'User is already exist in system.'});
             }
             
-            var salt = bcrypt.genSaltSync(10);                      //generate a salt to secure password using bcrypt
+            var salt = bcrypt.genSaltSync(10);                    //generate a salt to secure password using bcrypt
             var hash = await bcrypt.hash(req.body.password,salt);   //generate a hash to secure password using bcrypt
-
             //create a user
             user = await User.create({
                 name: req.body.name,
                 password: hash,
                 email: req.body.email
             })
-            
             // .then(user=> res.json(user))
             // .catch(err => { res.json({error: err,msg: err.message})}); as we afre using async/await
 
@@ -47,12 +46,12 @@ router.post('/createUser',
                 }
             }
             const authToken = jwt.sign(data,JWT_SECRET);
-
+            success = true;
             // res.send(user);
-            res.json(authToken)
+            res.json({success,authToken})
         }catch(error){
             console.error(error.withMessage);
-            res.status(500).json({error: 'Something went wrong!.'});
+            res.status(500).json({success,error: 'Something went wrong!.'});
         }
     }
  );
@@ -64,8 +63,7 @@ router.post('/createUser',
         // ,body('password','Password should not be empty').exists
     ],
      async (req,res) =>{
-        
-
+        let success = false;
         const errors = validationResult(req); //check for input parameter validation/sanitization
         if(!errors.isEmpty()){
             return res.status(400).json({error: errors.array()});
@@ -77,14 +75,14 @@ router.post('/createUser',
             //Check user with given email exist or not
             let user = await User.findOne({email: email});
             if(!user){
-                return res.status(400).json({error: 'Please Enter Valid Credential'});
+                return res.status(400).json({error: 'Please Enter Valid Credential',success});
             }
 
             //compare password with database hashed password 
             let compareResult = await bcrypt.compare(password,user.password); 
 
             if(!compareResult){
-                return res.status(400).json({error: 'Please Enter Valid Credential'});
+                return res.status(400).json({error: 'Please Enter Valid Credential',success});
             }
 
             let data = {
@@ -93,10 +91,11 @@ router.post('/createUser',
                 }
             }//payload
             const authToken = jwt.sign(data,JWT_SECRET); //craete a jwt token
-            res.json(authToken)
+            success = true;
+            res.json({success,authToken})
         }catch(error){
             console.error(error);
-            res.status(500).json({error: 'Something went wrong!.'});
+            res.status(500).json({error: 'Something went wrong!.',success});
         }
     }
 
